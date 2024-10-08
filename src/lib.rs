@@ -56,10 +56,19 @@ pub async fn process_body(_body: &[u8]) {
         None => "unknown_user".to_string(),
     };
 
-    let repo = match load.pull_request.repo.as_ref() {
-        Some(rep) => rep.name.to_owned(),
-        None => "unknown_repo".to_string(),
+    let json: Value = match serde_json::from_slice(_body) {
+        Ok(value) => value,
+        Err(e) => {
+            println!("Failed to parse JSON: {}", e);
+            return;
+        }
     };
+
+    let repo = json
+        .get("repository")
+        .and_then(|repo| repo.get("name"))
+        .and_then(|name| name.as_str())
+        .unwrap_or("unknown_repo");
 
     let pull_number = load.number;
     let title = load
