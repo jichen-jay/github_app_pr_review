@@ -216,6 +216,9 @@ pub async fn review_with_llm_octo(owner: &str, repo: &str, pull_number: u64, tit
         }
     }
 
+    log::info!("here is the review: {}", resp.clone());
+
+
     // Send the entire response to GitHub PR
     match issues.create_comment(pull_number, resp).await {
         Err(error) => {
